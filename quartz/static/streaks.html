@@ -1,6 +1,7 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Streaks</title><link rel="stylesheet" href="boards.css"><script src="boards.js"></script>
 <style>
+.heat{grid-auto-columns:12px;justify-content:start;align-content:start}
 .person{display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;margin-bottom:1rem}
 .person img{width:56px;height:56px;border-radius:50%;border:2px solid var(--line)}
 .person h2{margin:0}.person .sub{color:var(--dim);font-size:.85rem}
@@ -8,9 +9,10 @@
 .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.7rem;text-align:center}
 .stat b{display:block;font-size:1.6rem;font-family:"Schibsted Grotesk",sans-serif}
 .stat span{font-size:.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
-.hotwrap{display:grid;grid-template-columns:auto 1fr;gap:4px;overflow-x:auto;padding-bottom:.4rem}
-.months{grid-column:2;display:grid;grid-auto-flow:column;font-size:.7rem;color:var(--dim);height:14px}
-.dows{display:grid;grid-template-rows:repeat(7,12px);gap:2px;font-size:.65rem;color:var(--dim)}
+.hotwrap{display:grid;grid-template-columns:auto max-content;gap:4px;overflow-x:auto;padding-bottom:.4rem;justify-content:start}
+.months{grid-column:2;display:grid;gap:2px;font-size:.7rem;color:var(--dim);height:14px;justify-content:start}
+.months div{white-space:nowrap;overflow:visible}
+.dows{display:grid;grid-template-rows:repeat(7,12px);gap:2px;font-size:.65rem;color:var(--dim);align-self:end}
 .dows div{height:12px;line-height:12px}
 .heat div.today{outline:2px solid var(--accent);outline-offset:-1px}
 .legend{display:flex;gap:3px;align-items:center;font-size:.72rem;color:var(--dim);margin-top:.4rem}
@@ -45,26 +47,33 @@ function heatmap(u) {
   const heat = el("div", "heat");
   const today = new Date();
   const start = new Date(today - 181 * 864e5);
-  start.setDate(start.getDate() - start.getDay());
-  let lastMonth = -1, weekCount = 0, monthCols = [];
+  start.setDate(start.getDate() - start.getDay()); // back to Sunday
+  const labels = [];
+  let week = 0, lastMonth = -1;
   for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+    if (d.getDay() === 0 && d > start) week++;
     const key = dkey(d);
     const n = u.heatmap[key] || 0;
     const cell = el("div", n ? "h" + Math.min(4, n) : null);
+    cell.style.gridColumn = week + 1;
+    cell.style.gridRow = d.getDay() + 1;
     if (key === dkey(today)) cell.classList.add("today");
     cell.title = `${key} — ${n} contribution${n === 1 ? "" : "s"}`;
     heat.appendChild(cell);
-    if (d.getDay() === 0) {
-      weekCount++;
-      if (d.getMonth() !== lastMonth) { monthCols.push({ col: weekCount, label: d.toLocaleString("en", { month: "short" }) }); lastMonth = d.getMonth(); }
+    // label a month at the first week fully inside it
+    if (d.getDay() === 0 && d.getMonth() !== lastMonth) {
+      labels.push({ col: week + 1, label: d.toLocaleString("en", { month: "short" }) });
+      lastMonth = d.getMonth();
     }
   }
-  months.style.gridTemplateColumns = `repeat(${weekCount}, 14px)`;
-  let prev = 1;
-  monthCols.forEach((m, i) => {
-    const gap = el("div", null, m.label);
-    gap.style.gridColumn = m.col;
-    months.appendChild(gap);
+  const nWeeks = week + 1;
+  heat.style.gridTemplateColumns = `repeat(${nWeeks}, 12px)`;
+  months.style.gridTemplateColumns = `repeat(${nWeeks}, 12px)`;
+  labels.forEach(m => {
+    const t = el("div", null, m.label);
+    t.style.gridColumn = `${m.col} / span 3`;
+    t.style.gridRow = 1;
+    months.appendChild(t);
   });
   wrap.appendChild(months); wrap.appendChild(dows); wrap.appendChild(heat);
   return wrap;
@@ -104,7 +113,7 @@ loadData("streaks.json").then(data => {
     const active = (u.heatmap[dkey(new Date())] || 0) > 0;
     box.appendChild(el("p", "streakmsg", u.current_streak === 0
       ? "No streak — one push starts it."
-      : active ? `${u.current_streak} days and today is already banked.`
+      : active ? `${u.current_streak} day${u.current_streak === 1 ? "" : "s"} and today is already banked.`
                : `${u.current_streak}-day streak at risk — nothing pushed today yet.`));
     out.appendChild(box);
   }
