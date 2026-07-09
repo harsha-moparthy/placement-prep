@@ -1,17 +1,27 @@
-# Quartz v5
+# Placement Prep — Harsha × Akanksh
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+Shared knowledge base + coordination system for Dec-2026 placements. Quartz 5 on GitHub Pages.
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
+**Live site:** https://harsha-moparthy.github.io/placement-prep
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+## Daily workflow
+1. Write markdown notes in `content/<track>/` (LaTeX: `$...$` inline, `$$` blocks on their own lines; Obsidian syntax works).
+2. Frontmatter drives everything: `track`, `topic` (ids in `data/roadmap.yaml`), `status: done`, `author: harsha|akanksh`, `next_review: YYYY-MM-DD`.
+3. `git add -A && git commit && git push` → site auto-deploys.
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
+## Boards (under `/static/` on the live site)
+- **dashboard.html** — open GitHub Issues as a two-person kanban (labels: `track:*`, `p1-today|p2-this-week|p3-backlog`)
+- **streaks.html** — commit-day heatmap + current/longest streaks (nightly)
+- **roadmap.html** — per-track syllabus progress from note frontmatter
 
-## Sponsors
+## Automation (`.github/workflows/`)
+- `deploy.yml` — build + Pages on push
+- `snapshot-tasks.yml` / `compute-streaks.yml` / `compute-progress.yml` — refresh `data/generated/*.json` (committed with `[skip ci]`)
+- `spaced-review.yml` — nightly: opens `review` issues for notes whose `next_review` has arrived (+2d → +1w → +3w)
 
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+## Policy v1
+2-week self-certified checkpoints; buffer week each month-end (catch-up, else revision); blocked weeks become Reading Weeks; weekly puzzle hour; bi-weekly teaching swap; cross-domain mocks each phase.
+
+## Local dev
+Node 22+. `npm ci && node ./quartz/bootstrap-cli.mjs plugin install && node ./quartz/bootstrap-cli.mjs build --serve`
+
