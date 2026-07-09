@@ -1,0 +1,17 @@
+{
+ "generated": "2026-07-09T21:12:27.980488+00:00",
+ "tasks": [
+  {
+   "number": 3,
+   "title": "Add ROPE in ml section",
+   "labels": [
+    "type:task"
+   ],
+   "assignees": [
+    "harsha-moparthy"
+   ],
+   "url": "https://github.com/harsha-moparthy/placement-prep/issues/3",
+   "created_at": "2026-07-09T21:12:17Z"
+  }
+ ]
+}
