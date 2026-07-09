@@ -1,7 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Streaks</title><link rel="stylesheet" href="boards.css"><script src="boards.js"></script>
 <style>
-.heat{grid-auto-columns:12px;justify-content:start;align-content:start}
 .person{display:flex;flex-wrap:wrap;gap:1.2rem;align-items:center;margin-bottom:1rem}
 .person img{width:56px;height:56px;border-radius:50%;border:2px solid var(--line)}
 .person h2{margin:0}.person .sub{color:var(--dim);font-size:.85rem}
@@ -9,12 +8,16 @@
 .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.7rem;text-align:center}
 .stat b{display:block;font-size:1.6rem;font-family:"Schibsted Grotesk",sans-serif}
 .stat span{font-size:.75rem;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
-.hotwrap{display:grid;grid-template-columns:auto max-content;gap:4px;overflow-x:auto;padding-bottom:.4rem;justify-content:start}
-.months{grid-column:2;display:grid;gap:2px;font-size:.7rem;color:var(--dim);height:14px;justify-content:start}
-.months div{white-space:nowrap;overflow:visible}
-.dows{display:grid;grid-template-rows:repeat(7,12px);gap:2px;font-size:.65rem;color:var(--dim);align-self:end}
-.dows div{height:12px;line-height:12px}
-.heat div.today{outline:2px solid var(--accent);outline-offset:-1px}
+.lcbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.5rem;margin:.6rem 0 .4rem;font-size:.85rem;color:var(--dim)}
+.lcbar b{color:var(--text);font-weight:600}
+.lcwrap{display:flex;gap:14px;overflow-x:auto;padding:.2rem 0 .5rem}
+.lcmonth{display:flex;flex-direction:column;align-items:center;gap:5px;flex:none}
+.lcgrid{display:grid;grid-template-rows:repeat(7,10px);grid-auto-flow:column;grid-auto-columns:10px;gap:3px}
+.lcgrid div{width:10px;height:10px;border-radius:2px;background:var(--line)}
+.lcgrid div.empty{background:transparent}
+.lcgrid div.l1{background:#2cbb5d55}.lcgrid div.l2{background:#2cbb5d99}.lcgrid div.l3{background:#2cbb5dcc}.lcgrid div.l4{background:#2cbb5d}
+.lcgrid div.today{outline:1.5px solid #2cbb5d;outline-offset:0.5px}
+.lcmonth span{font-size:.72rem;color:var(--dim)}
 .legend{display:flex;gap:3px;align-items:center;font-size:.72rem;color:var(--dim);margin-top:.4rem}
 .legend i{width:12px;height:12px;border-radius:2px;background:var(--line);display:inline-block}
 .momentum{display:grid;grid-auto-flow:column;gap:6px;align-items:end;height:90px;margin-top:.5rem}
@@ -40,43 +43,45 @@ const COLORS = { harsha: "var(--accent)", akanksh: "var(--green)" };
 const dkey = d => d.toISOString().slice(0, 10);
 
 function heatmap(u) {
-  const wrap = el("div", "hotwrap");
-  const months = el("div", "months");
-  const dows = el("div", "dows");
-  ["", "Mon", "", "Wed", "", "Fri", ""].forEach(t => dows.appendChild(el("div", null, t)));
-  const heat = el("div", "heat");
+  const box = el("div");
   const today = new Date();
-  const start = new Date(today - 181 * 864e5);
-  start.setDate(start.getDate() - start.getDay()); // back to Sunday
-  const labels = [];
-  let week = 0, lastMonth = -1;
-  for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
-    if (d.getDay() === 0 && d > start) week++;
-    const key = dkey(d);
-    const n = u.heatmap[key] || 0;
-    const cell = el("div", n ? "h" + Math.min(4, n) : null);
-    cell.style.gridColumn = week + 1;
-    cell.style.gridRow = d.getDay() + 1;
-    if (key === dkey(today)) cell.classList.add("today");
-    cell.title = `${key} — ${n} contribution${n === 1 ? "" : "s"}`;
-    heat.appendChild(cell);
-    // label a month at the first week fully inside it
-    if (d.getDay() === 0 && d.getMonth() !== lastMonth) {
-      labels.push({ col: week + 1, label: d.toLocaleString("en", { month: "short" }) });
-      lastMonth = d.getMonth();
+  // window: current month and 5 before it
+  const first = new Date(today.getFullYear(), today.getMonth() - 5, 1);
+  let total = 0;
+  for (const [k, n] of Object.entries(u.heatmap)) if (new Date(k) >= first) total += n;
+  // LeetCode-style header line
+  const bar = el("div", "lcbar");
+  const left = el("div");
+  left.innerHTML = `<b>${total}</b> contribution${total === 1 ? "" : "s"} in the past 6 months`;
+  const right = el("div");
+  right.innerHTML = `Total active days: <b>${u.total_days}</b> &nbsp; Max streak: <b>${u.longest_streak}</b>`;
+  bar.appendChild(left); bar.appendChild(right);
+  box.appendChild(bar);
+  // month blocks
+  const wrap = el("div", "lcwrap");
+  for (let m = 0; m < 6; m++) {
+    const mStart = new Date(first.getFullYear(), first.getMonth() + m, 1);
+    const mEnd = new Date(first.getFullYear(), first.getMonth() + m + 1, 0);
+    const month = el("div", "lcmonth");
+    const grid = el("div", "lcgrid");
+    let week = 0;
+    for (let d = new Date(mStart); d <= mEnd && d <= today; d.setDate(d.getDate() + 1)) {
+      if (d.getDay() === 0 && d.getDate() !== 1) week++;
+      const key = dkey(d);
+      const n = u.heatmap[key] || 0;
+      const cell = el("div", n ? "l" + Math.min(4, n) : null);
+      cell.style.gridColumn = week + 1;
+      cell.style.gridRow = d.getDay() + 1;
+      if (key === dkey(today)) cell.classList.add("today");
+      cell.title = `${n} contribution${n === 1 ? "" : "s"} on ${d.toLocaleDateString("en", { month: "short", day: "numeric" })}`;
+      grid.appendChild(cell);
     }
+    month.appendChild(grid);
+    month.appendChild(el("span", null, mStart.toLocaleString("en", { month: "short" })));
+    wrap.appendChild(month);
   }
-  const nWeeks = week + 1;
-  heat.style.gridTemplateColumns = `repeat(${nWeeks}, 12px)`;
-  months.style.gridTemplateColumns = `repeat(${nWeeks}, 12px)`;
-  labels.forEach(m => {
-    const t = el("div", null, m.label);
-    t.style.gridColumn = `${m.col} / span 3`;
-    t.style.gridRow = 1;
-    months.appendChild(t);
-  });
-  wrap.appendChild(months); wrap.appendChild(dows); wrap.appendChild(heat);
-  return wrap;
+  box.appendChild(wrap);
+  return box;
 }
 
 function weekCountFor(u) {
@@ -107,7 +112,7 @@ loadData("streaks.json").then(data => {
     box.appendChild(stats);
     box.appendChild(heatmap(u));
     const lg = el("div", "legend"); lg.appendChild(el("span", null, "less"));
-    ["", "h1", "h2", "h3", "h4"].forEach(c => { const i = document.createElement("i"); if (c) i.className = c; lg.appendChild(i); });
+    ["", "#2cbb5d55", "#2cbb5d99", "#2cbb5dcc", "#2cbb5d"].forEach(c => { const i = document.createElement("i"); if (c) i.style.background = c; lg.appendChild(i); });
     lg.appendChild(el("span", null, "more"));
     box.appendChild(lg);
     const active = (u.heatmap[dkey(new Date())] || 0) > 0;
