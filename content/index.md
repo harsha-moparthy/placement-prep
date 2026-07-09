@@ -15,6 +15,7 @@ Shared knowledge base for Dec-2026 placements. Two decoupled tracks, defined jun
 - [[dsa/index|DSA]] · [[cp/index|CP]] · [[ml/index|ML]] — Harsha priority: DSA > CP > ML > ML System Design
 - [[quant/index|Quant]] — Akanksh: mental math (daily) → combinatorics → probability → stats/LA → Markov/game theory → mocks
 - [[mocks/index|Mock Interviews]] · [[retros/index|Weekly Retros]]
+- [[manual/index|Manual]] — how to write notes, use boards, fix issues (start here)
 
 ## Policy (v1)
 - 2-week cycles, checkpoint-based, self-certified. Slippage eats your own buffer, never the partner's calendar.
