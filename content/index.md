@@ -7,9 +7,9 @@ title: Home
 Shared knowledge base for Dec-2026 placements. Two decoupled tracks, defined junction points.
 
 ## Live boards
-- [Tasks Dashboard](/static/dashboard.html) — assigned tasks kanban (from GitHub Issues)
-- [Streaks](/static/streaks.html) — daily contribution heatmap
-- [Roadmap Progress](/static/roadmap.html) — per-track syllabus completion
+- <a href="https://harsha-moparthy.github.io/placement-prep/static/dashboard.html" target="_blank">Tasks Dashboard</a> — assigned tasks kanban (from GitHub Issues)
+- <a href="https://harsha-moparthy.github.io/placement-prep/static/streaks.html" target="_blank">Streaks</a> — daily contribution heatmap
+- <a href="https://harsha-moparthy.github.io/placement-prep/static/roadmap.html" target="_blank">Roadmap Progress</a> — per-track syllabus completion
 
 ## Tracks
 - [[dsa/index|DSA]] · [[cp/index|CP]] · [[ml/index|ML]] — Harsha priority: DSA > CP > ML > ML System Design
