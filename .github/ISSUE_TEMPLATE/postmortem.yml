@@ -1,0 +1,19 @@
+name: Post-mortem
+description: Log a failed problem for spaced revisit
+labels: ["postmortem"]
+body:
+  - type: input
+    id: link
+    attributes:
+      label: Problem link
+    validations: {required: true}
+  - type: input
+    id: struggle
+    attributes:
+      label: Struggle time (min)
+  - type: textarea
+    id: lesson
+    attributes:
+      label: One-sentence unlock / lesson
+    validations: {required: true}
+

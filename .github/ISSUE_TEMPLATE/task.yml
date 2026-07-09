@@ -1,0 +1,22 @@
+name: Task
+description: Assigned prep task
+labels: ["type:task"]
+body:
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track
+      options: [dsa, cp, ml, quant, joint]
+    validations: {required: true}
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: ["p1-today", "p2-this-week", "p3-backlog"]
+    validations: {required: true}
+  - type: textarea
+    id: detail
+    attributes:
+      label: What exactly (definition of done)
+    validations: {required: true}
+

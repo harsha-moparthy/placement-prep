@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tasks Dashboard</title><link rel="stylesheet" href="boards.css"><script src="boards.js"></script></head><body>
+<nav><a href="../">← Notes</a><a href="dashboard.html"><b>Tasks</b></a><a href="streaks.html">Streaks</a><a href="roadmap.html">Roadmap</a></nav>
+<h1>Tasks Dashboard</h1>
+<p><a class="btn" href="https://github.com/harsha-moparthy/placement-prep/issues/new/choose">+ New task / question</a>
+<span id="meta" style="margin-left:1rem;color:var(--dim)"></span></p>
+<div id="banner" class="banner"></div>
+<div class="cols" id="board"></div>
+<script>
+loadData("tasks.json").then(data => {
+  if (!data) return;
+  document.getElementById("meta").textContent = `${data.tasks.length} open · updated ${new Date(data.generated).toLocaleString()}`;
+  const board = document.getElementById("board");
+  const buckets = { "harsha-moparthy": [], "AvAkanksh": [], unassigned: [] };
+  for (const t of data.tasks) {
+    const owners = t.assignees.filter(a => a in buckets);
+    if (owners.length === 0) buckets.unassigned.push(t);
+    owners.forEach(o => buckets[o].push(t));
+  }
+  const order = ["p1-today", "p2-this-week", "p3-backlog"];
+  const prio = t => { const i = order.findIndex(p => t.labels.includes(p)); return i === -1 ? 9 : i; };
+  for (const [name, tasks] of Object.entries(buckets)) {
+    const col = el("div", "col");
+    col.appendChild(el("h2", null, `${name} (${tasks.length})`));
+    tasks.sort((a, b) => prio(a) - prio(b));
+    for (const t of tasks) {
+      const c = el("div", "card");
+      const a = el("a", null, `#${t.number} ${t.title}`);
+      a.href = t.url;
+      c.appendChild(a);
+      const labels = el("div");
+      t.labels.forEach(l => labels.appendChild(el("span", "lbl " + l, l)));
+      c.appendChild(labels);
+      col.appendChild(c);
+    }
+    board.appendChild(col);
+  }
+});
+</script></body></html>

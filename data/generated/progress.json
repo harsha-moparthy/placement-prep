@@ -1,0 +1,360 @@
+{
+ "generated": "2026-07-09T20:36:40.232689+00:00",
+ "tracks": {
+  "dsa": {
+   "title": "DSA (Striver A2Z)",
+   "owner": "harsha",
+   "total": 16,
+   "users": {
+    "harsha": {
+     "done": 0,
+     "pct": 0
+    },
+    "akanksh": {
+     "done": 0,
+     "pct": 0
+    }
+   },
+   "topics": {
+    "arrays": {
+     "title": "Arrays & Hashing",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "binary-search": {
+     "title": "Binary Search",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "strings": {
+     "title": "Strings",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "linked-lists": {
+     "title": "Linked Lists",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "recursion-backtracking": {
+     "title": "Recursion & Backtracking",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "bit-manipulation": {
+     "title": "Bit Manipulation",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "stacks-queues": {
+     "title": "Stacks & Queues",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "sliding-window": {
+     "title": "Sliding Window & Two Pointers",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "heaps": {
+     "title": "Heaps / Priority Queues",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "greedy": {
+     "title": "Greedy",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "binary-trees": {
+     "title": "Binary Trees",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "bst": {
+     "title": "Binary Search Trees",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "graphs": {
+     "title": "Graphs (BFS/DFS/SCC/MST/Shortest Paths)",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "dp": {
+     "title": "Dynamic Programming",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "tries": {
+     "title": "Tries",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "advanced": {
+     "title": "Segment Trees / Advanced",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    }
+   }
+  },
+  "cp": {
+   "title": "Competitive Programming",
+   "owner": "harsha",
+   "total": 5,
+   "users": {
+    "harsha": {
+     "done": 0,
+     "pct": 0
+    },
+    "akanksh": {
+     "done": 0,
+     "pct": 0
+    }
+   },
+   "topics": {
+    "cf-div2-ab": {
+     "title": "CF Div2 A/B consistency",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "cf-div2-c": {
+     "title": "CF Div2 C patterns",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "number-theory": {
+     "title": "Number Theory & Combinatorics for CP",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "contest-cadence": {
+     "title": "Weekly contest habit (Aug onward)",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "upsolving": {
+     "title": "Upsolve every contest",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    }
+   }
+  },
+  "ml": {
+   "title": "ML Depth + System Design",
+   "owner": "harsha",
+   "total": 7,
+   "users": {
+    "harsha": {
+     "done": 0,
+     "pct": 0
+    },
+    "akanksh": {
+     "done": 0,
+     "pct": 0
+    }
+   },
+   "topics": {
+    "classical-ml": {
+     "title": "Classical ML (regression",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "probability-ml": {
+     "title": "Probability & Statistics for ML",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "deep-learning": {
+     "title": "DL fundamentals (backprop",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "transformers": {
+     "title": "Transformers & Attention",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "llm-agents": {
+     "title": "LLMs & Agents",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "resume-projects": {
+     "title": "Resume project deep-dives",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "ml-system-design": {
+     "title": "ML System Design (Oct)",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    }
+   }
+  },
+  "quant": {
+   "title": "Quant (QR/QT)",
+   "owner": "akanksh",
+   "total": 13,
+   "users": {
+    "harsha": {
+     "done": 0,
+     "pct": 0
+    },
+    "akanksh": {
+     "done": 1,
+     "pct": 8
+    }
+   },
+   "topics": {
+    "mental-math": {
+     "title": "Tier 0: Mental math (daily, all 13 weeks)",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "combinatorics": {
+     "title": "Tier 1: Combinatorics",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "discrete-prob": {
+     "title": "Tier 1: Discrete probability & Bayes",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "continuous-dist": {
+     "title": "Tier 2: Continuous distributions",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "expectation": {
+     "title": "Tier 2: Expectation, variance, conditional E",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "done"
+     }
+    },
+    "classic-puzzles": {
+     "title": "Tier 2: Classic puzzles (Mosteller, Brainstellar)",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "statistics": {
+     "title": "Tier 3: Statistics & estimation (MLE, CLT)",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "linear-algebra": {
+     "title": "Tier 3: Linear algebra",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "hard-puzzles": {
+     "title": "Tier 3: Harder puzzles",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "markov": {
+     "title": "Tier 4: Markov chains & stochastic processes",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "game-theory": {
+     "title": "Tier 4: Game theory basics",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "quant-coding": {
+     "title": "Parallel: light coding (3x/week)",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    },
+    "mocks": {
+     "title": "Tier 5: Timed mocks & Fermi drills",
+     "status": {
+      "harsha": "todo",
+      "akanksh": "todo"
+     }
+    }
+   }
+  }
+ }
+}

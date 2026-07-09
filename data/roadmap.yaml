@@ -1,0 +1,65 @@
+# Syllabus definition — source of truth for roadmap progress bars.
+# A topic counts "done" for a person when at least one note has
+# frontmatter: track=<track>, topic=<id>, status=done, author=<person>.
+people:
+  harsha: harsha-moparthy
+  akanksh: AvAkanksh
+
+tracks:
+  dsa:
+    title: DSA (Striver A2Z)
+    owner: harsha
+    topics:
+      - {id: arrays, title: Arrays & Hashing}
+      - {id: binary-search, title: Binary Search}
+      - {id: strings, title: Strings}
+      - {id: linked-lists, title: Linked Lists}
+      - {id: recursion-backtracking, title: Recursion & Backtracking}
+      - {id: bit-manipulation, title: Bit Manipulation}
+      - {id: stacks-queues, title: Stacks & Queues}
+      - {id: sliding-window, title: Sliding Window & Two Pointers}
+      - {id: heaps, title: Heaps / Priority Queues}
+      - {id: greedy, title: Greedy}
+      - {id: binary-trees, title: Binary Trees}
+      - {id: bst, title: Binary Search Trees}
+      - {id: graphs, title: Graphs (BFS/DFS/SCC/MST/Shortest Paths)}
+      - {id: dp, title: Dynamic Programming}
+      - {id: tries, title: Tries}
+      - {id: advanced, title: Segment Trees / Advanced}
+  cp:
+    title: Competitive Programming
+    owner: harsha
+    topics:
+      - {id: cf-div2-ab, title: CF Div2 A/B consistency}
+      - {id: cf-div2-c, title: CF Div2 C patterns}
+      - {id: number-theory, title: Number Theory & Combinatorics for CP}
+      - {id: contest-cadence, title: Weekly contest habit (Aug onward)}
+      - {id: upsolving, title: Upsolve every contest}
+  ml:
+    title: ML Depth + System Design
+    owner: harsha
+    topics:
+      - {id: classical-ml, title: Classical ML (regression, trees, SVM, ensembles)}
+      - {id: probability-ml, title: Probability & Statistics for ML}
+      - {id: deep-learning, title: DL fundamentals (backprop, CNN, RNN)}
+      - {id: transformers, title: Transformers & Attention}
+      - {id: llm-agents, title: LLMs & Agents}
+      - {id: resume-projects, title: Resume project deep-dives}
+      - {id: ml-system-design, title: ML System Design (Oct)}
+  quant:
+    title: Quant (QR/QT)
+    owner: akanksh
+    topics:
+      - {id: mental-math, title: "Tier 0: Mental math (daily, all 13 weeks)"}
+      - {id: combinatorics, title: "Tier 1: Combinatorics"}
+      - {id: discrete-prob, title: "Tier 1: Discrete probability & Bayes"}
+      - {id: continuous-dist, title: "Tier 2: Continuous distributions"}
+      - {id: expectation, title: "Tier 2: Expectation, variance, conditional E"}
+      - {id: classic-puzzles, title: "Tier 2: Classic puzzles (Mosteller, Brainstellar)"}
+      - {id: statistics, title: "Tier 3: Statistics & estimation (MLE, CLT)"}
+      - {id: linear-algebra, title: "Tier 3: Linear algebra"}
+      - {id: hard-puzzles, title: "Tier 3: Harder puzzles"}
+      - {id: markov, title: "Tier 4: Markov chains & stochastic processes"}
+      - {id: game-theory, title: "Tier 4: Game theory basics"}
+      - {id: quant-coding, title: "Parallel: light coding (3x/week)"}
+      - {id: mocks, title: "Tier 5: Timed mocks & Fermi drills"}

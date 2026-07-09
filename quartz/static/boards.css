@@ -1,0 +1,20 @@
+:root{--bg:#faf8f8;--card:#fff;--line:#e5e5e5;--text:#2b2b2b;--dim:#4e4e4e;--accent:#284b63;--green:#84a59d}
+@media(prefers-color-scheme:dark){:root{--bg:#161618;--card:#1f1f22;--line:#393639;--text:#ebebec;--dim:#b8b8b8;--accent:#7b97aa}}
+*{box-sizing:border-box}body{font-family:"Source Sans Pro",system-ui,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:2rem;max-width:1100px;margin-inline:auto}
+h1{font-family:"Schibsted Grotesk",sans-serif}a{color:var(--accent)}
+.banner{background:#b3540022;border:1px solid #b35400;color:inherit;padding:.5rem 1rem;border-radius:8px;margin:1rem 0;display:none}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+.col{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1rem}
+.card{border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem;margin:.5rem 0}
+.lbl{display:inline-block;font-size:.72rem;padding:.05rem .5rem;border-radius:99px;border:1px solid var(--line);margin-right:.25rem;color:var(--dim)}
+.lbl.p1-today{border-color:#c0392b;color:#c0392b}.lbl.p2-this-week{border-color:#b35400;color:#b35400}
+.bar{background:var(--line);border-radius:99px;height:12px;overflow:hidden;margin:.3rem 0}
+.bar>div{height:100%;background:var(--accent)}.bar.b2>div{background:var(--green)}
+table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid var(--line);padding:.4rem;text-align:left;font-size:.9rem}
+.done{color:var(--green);font-weight:700}.todo{color:var(--dim)}
+.heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,12px);gap:2px;overflow-x:auto;padding-bottom:.5rem}
+.heat div{width:12px;height:12px;border-radius:2px;background:var(--line)}
+.h1{background:#9bc4b3!important}.h2{background:#6fae97!important}.h3{background:#4a9179!important}.h4{background:#2e6f5a!important}
+.fire{font-size:1.4rem;font-weight:700}
+nav a{margin-right:1rem}
+.btn{display:inline-block;background:var(--accent);color:#fff;padding:.35rem .9rem;border-radius:8px;text-decoration:none;font-size:.9rem}

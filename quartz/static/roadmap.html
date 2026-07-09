@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Roadmap Progress</title><link rel="stylesheet" href="boards.css"><script src="boards.js"></script></head><body>
+<nav><a href="../">← Notes</a><a href="dashboard.html">Tasks</a><a href="streaks.html">Streaks</a><a href="roadmap.html"><b>Roadmap</b></a></nav>
+<h1>Roadmap Progress</h1>
+<p style="color:var(--dim)">A topic turns done when a note with <code>status: done</code> for it lands in <code>content/</code>.</p>
+<div id="banner" class="banner"></div>
+<div id="out"></div>
+<script>
+loadData("progress.json").then(data => {
+  if (!data) return;
+  const out = document.getElementById("out");
+  for (const [tid, tr] of Object.entries(data.tracks)) {
+    const box = el("div", "col"); box.style.margin = "1rem 0";
+    box.appendChild(el("h2", null, `${tr.title} — owner: ${tr.owner}`));
+    let i = 0;
+    for (const [p, u] of Object.entries(tr.users)) {
+      box.appendChild(el("div", null, `${p}: ${u.done}/${tr.total} (${u.pct}%)`));
+      const bar = el("div", "bar" + (i++ ? " b2" : ""));
+      const fill = el("div"); fill.style.width = u.pct + "%"; bar.appendChild(fill);
+      box.appendChild(bar);
+    }
+    const det = el("details"); det.appendChild(el("summary", null, "topics"));
+    const tbl = el("table");
+    const hdr = el("tr"); ["topic", ...Object.keys(tr.users)].forEach(h => hdr.appendChild(el("th", null, h)));
+    tbl.appendChild(hdr);
+    for (const [id, t] of Object.entries(tr.topics)) {
+      const row = el("tr");
+      row.appendChild(el("td", null, t.title));
+      for (const p of Object.keys(tr.users)) row.appendChild(el("td", t.status[p], t.status[p] === "done" ? "\u2713 done" : "\u00b7"));
+      tbl.appendChild(row);
+    }
+    det.appendChild(tbl); box.appendChild(det); out.appendChild(box);
+  }
+});
+</script></body></html>

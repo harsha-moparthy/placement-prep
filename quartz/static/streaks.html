@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Streaks</title><link rel="stylesheet" href="boards.css"><script src="boards.js"></script></head><body>
+<nav><a href="../">← Notes</a><a href="dashboard.html">Tasks</a><a href="streaks.html"><b>Streaks</b></a><a href="roadmap.html">Roadmap</a></nav>
+<h1>Contribution Streaks</h1>
+<div id="banner" class="banner"></div>
+<div id="out"></div>
+<script>
+loadData("streaks.json").then(data => {
+  if (!data) return;
+  const out = document.getElementById("out");
+  for (const [person, u] of Object.entries(data.users)) {
+    const box = el("div", "col");
+    box.style.margin = "1rem 0";
+    box.appendChild(el("h2", null, person));
+    box.appendChild(el("div", "fire", `\u{1F525} ${u.current_streak}-day streak · longest ${u.longest_streak} · ${u.total_days} active days`));
+    const heat = el("div", "heat");
+    const end = new Date(); const start = new Date(end - 181 * 864e5);
+    start.setDate(start.getDate() - start.getDay()); // align to Sunday
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const key = d.toISOString().slice(0, 10);
+      const n = u.heatmap[key] || 0;
+      const cell = el("div", n ? "h" + Math.min(4, n) : null);
+      cell.title = `${key}: ${n} commits`;
+      heat.appendChild(cell);
+    }
+    box.appendChild(heat);
+    out.appendChild(box);
+  }
+});
+</script></body></html>

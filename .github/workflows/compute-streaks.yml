@@ -1,0 +1,30 @@
+name: Compute streaks
+on:
+  schedule:
+    - cron: "30 18 * * *"   # 00:00 IST nightly
+  push:
+    branches: [main]
+    paths: ["content/**"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: data-commits
+jobs:
+  streaks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python scripts/compute_streaks.py
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git pull --rebase
+          git add data/generated
+          git diff --cached --quiet || { git commit -m "chore: update streaks.json [skip ci]"; git push; }

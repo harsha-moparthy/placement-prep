@@ -1,0 +1,14 @@
+name: Question
+description: Ask your partner a doubt
+labels: ["type:question", "needs-triage"]
+body:
+  - type: input
+    id: context
+    attributes:
+      label: Related note/page URL
+  - type: textarea
+    id: q
+    attributes:
+      label: Question
+    validations: {required: true}
+
