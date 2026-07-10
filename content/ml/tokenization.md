@@ -119,12 +119,79 @@ enc.encode("unbelievable!")                     # -> [370, 31866, 12691, 0]
 - Numbers tokenize inconsistently (`2024` may be one token, `20 24` two) — one reason LLMs are shaky at arithmetic.
 - The famous "how many r's in strawberry" failure is a tokenization artifact: the model sees token ids, not letters.
 
-## 6. Interview questions to be ready for
-1. Why subword over word/char? (OOV vs sequence length trade-off)
-2. Walk through one BPE merge step on a toy corpus. (Do it on paper: `low, lower, newest, widest`)
-3. BPE vs WordPiece vs Unigram — training and encoding differences.
-4. Why does GPT-2 use *byte-level* BPE? What problem disappears?
-5. How does vocabulary size trade off against sequence length and embedding-matrix size ($V \times d$ parameters)?
-6. Why is `" hello"` a different token from `"hello"`? Why does this matter for prompt engineering?
 
-*Grounding: Hugging Face LLM course ch. 6 (pipeline, algorithm comparison table, Ġ/▁ behavior); Sennrich et al. 2015 (BPE, arXiv:1508.07909); SentencePiece: Kudo & Richardson 2018.*
+## 6. Worked example: training BPE by hand
+
+The classic corpus (from Sennrich et al.'s paper setup). Word frequencies:
+
+| word | freq | as symbols |
+|---|---|---|
+| low | 5 | `l o w` |
+| lower | 2 | `l o w e r` |
+| newest | 6 | `n e w e s t` |
+| widest | 3 | `w i d e s t` |
+
+**Merge 1.** Count every adjacent pair across the corpus (weighted by word frequency):
+
+$$
+\underbrace{(e,s)}_{6+3=9},\; \underbrace{(s,t)}_{6+3=9},\; \underbrace{(l,o)}_{5+2=7},\; \underbrace{(o,w)}_{5+2=7},\; \underbrace{(w,e)}_{2+6=8},\; \underbrace{(n,e)}_{6},\; \dots
+$$
+
+Highest count is 9 → merge `(e,s)` into `es`. Now `newest = n e w es t`, `widest = w i d es t`.
+
+**Merge 2.** Recount. `(es,t)` appears $6+3=9$ times → merge into `est`. Now `newest = n e w est`.
+
+**Merge 3.** `(l,o)` has 7 → merge into `lo`.
+
+**Merge 4.** `(lo,w)` has 7 → merge into `low`. Now `low` is a single token, `lower = low e r`.
+
+**Merge 5.** `(n,e)`, `(e,w)`, `(w,est)` all have 6 → merge `(n,e)` (first encountered).
+
+Learned so far: `merges = [es, est, lo, low, ne]`. To **encode** a new word, split into characters and replay merges *in this order*: `"lowest"` → `l o w e s t` → `l o w es t` → `l o w est` → `lo w est` → `low est`. Two tokens, and the word was never in the corpus. That is the entire trick. Interviewers at GenAI-heavy loops genuinely ask you to do exactly this on a whiteboard.
+
+## 7. Worked example: WordPiece encoding
+
+Vocabulary (fragment): `{un, ##believ, ##able, ##b, ##e, b, e, ...}`. Encode `unbelievable` by greedy **longest-match-first**:
+
+1. Longest prefix of `unbelievable` in vocab → `un`. Remainder: `believable` (now must match `##`-prefixed pieces).
+2. Longest `##`-piece matching `believable` → `##believ`. Remainder: `able`.
+3. `##able` is in vocab → done: `un + ##believ + ##able`.
+
+If at any step *nothing* matches, the whole word becomes `[UNK]` — unlike BPE, which can always fall back to characters/bytes. This is why BERT can emit `[UNK]` but GPT-2 can't.
+
+## 8. Worked example: Unigram picks a segmentation
+
+Vocabulary with learned probabilities: $p(\text{hug})=0.20$, $p(\text{ug})=0.15$, $p(\text{hu})=0.10$, $p(\text{h})=p(\text{u})=p(\text{g})=0.05$. Score every segmentation of `"hug"` by the product of token probabilities:
+
+$$
+P(\text{hug}) = 0.20 \quad\gg\quad P(\text{h,ug}) = 0.05 \times 0.15 = 0.0075 \quad > \quad P(\text{hu,g}) = 0.005 \quad > \quad P(\text{h,u,g}) \approx 0.000125
+$$
+
+Viterbi finds the argmax efficiently (dynamic programming over prefixes — itself a nice DP interview question). Training repeatedly deletes the vocabulary entries whose removal hurts total corpus likelihood least, until the target size is reached.
+
+## 9. Depth notes interviewers probe
+
+**Vocabulary size is a parameter-count decision.** The embedding matrix is $V \times d$. GPT-2 small: $50257 \times 768 \approx 38.6$M parameters — roughly **a third of the whole 124M model**. Doubling vocab shortens sequences (cheaper attention) but grows this matrix and softens each token's training signal. Weight tying (input embedding = output softmax matrix) halves the bill; most GPT-style models do it.
+
+**Same text, different models, different bills.** Every model family trains its own tokenizer: the same sentence can be 13 tokens under GPT-4's `cl100k_base` and 15 under LLaMA's SentencePiece-BPE. Always count with the model's own tokenizer, never a rule of thumb, when estimating cost or context fit.
+
+**Code is token-dense.** Indentation, braces, and unusual identifiers each split into their own tokens; a 100-line Python function is typically 400-800 tokens. This is why "put the whole repo in context" dies faster than people expect.
+
+**Special tokens eat context invisibly.** Chat templates (role markers, turn separators, BOS/EOS) add tens of tokens per turn beyond the visible text.
+
+**Prompt caching is token-prefix caching.** Providers cache at token boundaries and need an exact prefix match — so put the stable system prompt first and the variable user query last.
+
+## 10. Questions actually asked in top-company loops
+
+Compiled/paraphrased from published interview-prep collections and reported interview experiences (myengineeringpath.dev's 30-question LLM set and tokenization guide; mlinterviews.substack.com; ai.plainenglish.io FAANG 2025 roundup):
+
+1. **"Walk me through BPE from scratch"** — expected: the merge loop (Section 6), plus *why*: frequent text compresses to single tokens, rare text degrades gracefully, nothing is ever unknown.
+2. **"Why does tokenization matter in production?"** — the senior-level answer connects it to **cost** (billed per token), **context budget** (128k means tokens, not characters), and **multilingual fairness** (non-Latin scripts cost 2-4x more tokens for the same meaning).
+3. **"BPE vs WordPiece vs Unigram — when would the difference matter?"** — merge-by-frequency vs merge-by-likelihood vs prune-by-likelihood; Unigram gives more consistent splits of rare words and supports sampling segmentations.
+4. **"Estimate the tokens in this API call / how would you count them?"** — model-specific tokenizer (`tiktoken`, HF tokenizer), never chars/4 for anything that touches billing.
+5. **"Why can't the model count letters in a word?"** — it sees subword ids; character information is only implicit.
+6. **"Your embedding matrix vs vocab size trade-off"** — the $V \times d$ math above.
+7. **"Why do LLMs handle code / numbers oddly?"** — token density and inconsistent number splits.
+8. (Amazon/Meta system-design flavored) **"Your multilingual chatbot's Hindi bills are 3x English — why, and what do you do?"** — fertility; options: different model/tokenizer, translate-then-process, or accept and budget.
+
+*Grounding for this section: the two fetched pages above; question phrasings are paraphrased, not quoted.*

@@ -116,12 +116,83 @@ where each head $h$ gets a different fixed slope $m_h$ (a geometric sequence lik
 | RoPE | rotates Q,K every layer | no | yes (via dot product) | with angle rescaling | LLaMA, Qwen, Mistral |
 | ALiBi | attention logits | no | yes | **best** | BLOOM, MPT |
 
-## 8. Interview questions to be ready for
-1. Prove/explain why attention without PE is permutation-equivariant.
-2. Write the sinusoidal formula. Why sinusoids and not a linear ramp $pos/L$? (unique smooth fingerprint, relative shifts are rotations, no magnitude explosion)
-3. Why does RoPE apply to Q and K but not V? (position should influence *matching*, not the *content* being aggregated)
-4. Show that RoPE attention depends only on $m-n$.
-5. Your model was trained on 4k context. What breaks at 8k for each method, and what is the cheapest fix? (learned: breaks outright; RoPE: rescale angles + light finetune; ALiBi: mostly just works)
-6. Where does each method inject position — input vs every attention layer — and why does that matter?
+## 8. Worked example: sinusoidal PE with real numbers
 
-*Grounding: Vaswani et al. 2017 (Attention Is All You Need) for sinusoidal; Su et al. 2021 arXiv:2104.09864 abstract fetched for RoPE claims (rotation matrix, relative dependency, decay, length flexibility); Press et al. 2021 arXiv:2108.12409 for ALiBi; Raffel et al. 2020 for T5 bias.*
+Take a tiny model with $d=4$. Then there are two frequency pairs: $\theta_0 = 1/10000^{0} = 1$ and $\theta_1 = 1/10000^{2/4} = 0.01$.
+
+$$
+PE_{pos} = \big[\sin(pos),\ \cos(pos),\ \sin(0.01\,pos),\ \cos(0.01\,pos)\big]
+$$
+
+| pos | dim 0 (fast sin) | dim 1 (fast cos) | dim 2 (slow sin) | dim 3 (slow cos) |
+|---|---|---|---|---|
+| 0 | 0.000 | 1.000 | 0.000 | 1.000 |
+| 1 | 0.841 | 0.540 | 0.010 | 1.000 |
+| 2 | 0.909 | −0.416 | 0.020 | 1.000 |
+| 3 | 0.141 | −0.990 | 0.030 | 1.000 |
+
+Read it like a clock shop: dims 0-1 are a second hand (distinguish neighbors), dims 2-3 an hour hand (distinguish position 3 from position 300). Together the vector is unique for every position, and all values stay in $[-1,1]$ — no magnitude blow-up like a raw ramp $pos$ would cause.
+
+**The linear-shift property, concretely.** For one frequency, the pair at position $pos$ is $(\sin\omega\, pos, \cos\omega \,pos)$. The angle-addition identities give
+
+$$
+\begin{pmatrix} \sin \omega(pos+k) \\ \cos \omega(pos+k) \end{pmatrix}
+=
+\begin{pmatrix} \cos\omega k & \sin\omega k \\ -\sin\omega k & \cos\omega k \end{pmatrix}
+\begin{pmatrix} \sin \omega\, pos \\ \cos \omega\, pos \end{pmatrix}
+$$
+
+so "shift by $k$" is one fixed rotation matrix, independent of $pos$. A single linear layer can therefore learn "attend 3 tokens back" — the design goal stated in the original paper.
+
+## 9. Worked example: RoPE really only sees distance
+
+Let a query and key both be the 2-D vector $(1, 0)$, with $\theta = 0.5$ rad.
+
+- Query at position $m=3$: rotated by $1.5$ rad → $q' = (\cos 1.5, \sin 1.5) = (0.071, 0.997)$
+- Key at position $n=1$: rotated by $0.5$ rad → $k' = (0.878, 0.479)$
+- Dot product: $0.071 \times 0.878 + 0.997 \times 0.479 = 0.540 = \cos(1.0)$
+
+Now move both tokens 10 positions to the right ($m=13, n=11$): the rotations change, but the dot product is again $\cos\big((13-11)\times 0.5\big) = \cos(1.0) = 0.540$. Identical. In general, for rotations the dot product only sees the **angle difference**:
+
+$$
+\langle R(m\theta)\,q,\; R(n\theta)\,k \rangle = \langle q,\; R\big((n-m)\theta\big)\,k \rangle
+$$
+
+because rotation matrices satisfy $R(a)^\top R(b) = R(b-a)$. That one line is the whole RoPE proof, and it's a favorite "show me" prompt in research-engineer loops. A full $d$-dim head is just $d/2$ independent 2-D rotations at frequencies $\theta_i = 10000^{-2i/d}$ — same clock-shop idea as sinusoidal PE, but applied multiplicatively to Q and K inside every layer.
+
+Why not rotate V? Position should change **who attends to whom** (the matching), not **what content gets mixed** once the weights are decided. Rotating V would corrupt the payload.
+
+## 10. Worked example: ALiBi head slopes
+
+With 8 heads, slopes are the geometric sequence $m_h = 2^{-h}$: $\tfrac{1}{2}, \tfrac{1}{4}, \tfrac{1}{8}, \dots, \tfrac{1}{256}$. For a query at position 10:
+
+| key position | distance | head 1 penalty ($m=\tfrac12$) | head 8 penalty ($m=\tfrac{1}{256}$) |
+|---|---|---|---|
+| 9 | 1 | −0.5 | −0.004 |
+| 5 | 5 | −2.5 | −0.020 |
+| 0 | 10 | −5.0 | −0.039 |
+
+Head 1 is myopic (effectively a local-window head); head 8 barely cares about distance (a global head). The model gets a spectrum of receptive fields for free, with **zero learned position parameters** — which is exactly why it extrapolates: position 5000 is not "unseen", it's just a bigger penalty on the same line.
+
+## 11. Long-context: what actually breaks
+
+- **Learned absolute**: position 4097 has no embedding row. Hard crash of quality; only fix is retraining/resizing.
+- **Sinusoidal**: defined for any position, but the model never *saw* those phase combinations; quality decays.
+- **RoPE**: at unseen positions the fast-frequency dims spin into unseen angle territory. **Position interpolation** rescales positions ($m \to m \cdot \frac{L_{train}}{L_{new}}$) to squeeze new lengths into the trained angle range, then briefly finetunes — the standard recipe behind long-context LLaMA variants (NTK-aware scaling is the refinement that rescales frequencies unevenly).
+- **ALiBi**: designed for this; train-short-test-long is its headline result.
+
+## 12. Questions actually asked in top-company loops
+
+Paraphrased from published interview collections and prep guides (myengineeringpath.dev LLM question set; Towards Data Science and learncodecamp RoPE guides; igotanoffer FAANG ML question roundups):
+
+1. **"Why do transformers need positional encoding at all when RNNs don't?"** — attention is permutation-equivariant (Section 1); RNNs get order for free from recurrence.
+2. **"Write the sinusoidal formula and explain the 10000."** — it sets the geometric frequency ladder; smallest wavelength $2\pi$, largest $2\pi \cdot 10000$, so both neighbors and far positions are distinguishable.
+3. **"Why sin *and* cos, not just sin?"** — the pair makes shift-by-$k$ a rotation (Section 8's identity); with sin alone the map from position to phase is ambiguous and not linearly shiftable.
+4. **"Explain RoPE to me like I haven't read the paper"** (Meta/DeepMind-style, per the RoPE explainers above) — rotate Q and K by position-proportional angles; dot products then depend only on relative distance; show the $R(a)^\top R(b)=R(b-a)$ step.
+5. **"Why apply RoPE to Q,K but not V?"** — matching vs content (Section 9).
+6. **"Model trained at 4k, need 32k — options?"** — per method (Section 11); expected to mention position interpolation + short finetune for RoPE, and why ALiBi models mostly just work.
+7. **"Additive PE vs bias-in-attention vs rotation — compare"** — the table in Section 7; the deep answer notes *where* information enters: once at the input (sinusoidal/learned) vs every layer's attention (T5/RoPE/ALiBi), and that input-level PE can wash out in deep stacks.
+8. **"Does BERT use sinusoidal PE?"** — a common trap: no, BERT uses *learned absolute* embeddings; the original Transformer used sinusoidal.
+9. (System-design flavored) **"You're fine-tuning LLaMA for 100k-token legal documents — walk me through the positional-encoding implications end to end."**
+
+*Grounding: Vaswani et al. 2017; Su et al. 2021 (arXiv:2104.09864, abstract fetched — rotation formulation, relative dependency, distance decay); Press et al. 2021 (ALiBi, arXiv:2108.12409); the fetched/search-listed explainers above for what interviewers emphasize. Question phrasings are paraphrased.*
