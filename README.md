@@ -22,6 +22,9 @@ Shared knowledge base + coordination system for Dec-2026 placements. Quartz 5 on
 ## Policy v1
 2-week self-certified checkpoints; buffer week each month-end (catch-up, else revision); blocked weeks become Reading Weeks; weekly puzzle hour; bi-weekly teaching swap; cross-domain mocks each phase.
 
+## For LLMs / AI assistants
+Read [llm_help.md](llm_help.md) before drafting any content — frontmatter contract, rendering rules, and the full issue→fix catalog.
+
 ## Local dev
 Node 22+. `npm ci && node ./quartz/bootstrap-cli.mjs plugin install && node ./quartz/bootstrap-cli.mjs build --serve`
 
